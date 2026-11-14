@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>myaishitmodels · 模型导航</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --line:#232a33; --fg:#e6edf3; --dim:#8b949e;
+    --accent:#58a6ff; --ok:#3fb950; --warn:#d29922;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:15px/1.65 ui-sans-serif,-apple-system,"Segoe UI","Noto Sans SC",sans-serif}
+  header{padding:56px 24px 28px;text-align:center;border-bottom:1px solid var(--line)}
+  h1{margin:0;font-size:30px;letter-spacing:.5px}
+  .sub{color:var(--dim);margin-top:10px;font-size:14px}
+  main{max-width:1000px;margin:0 auto;padding:28px 20px 80px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+        padding:18px 18px 16px;transition:.15s;display:flex;flex-direction:column}
+  .card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .card h2{margin:0 0 6px;font-size:17px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+  .tags{margin:8px 0 10px;display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:99px;padding:1px 8px}
+  .desc{color:var(--dim);font-size:13.5px;flex:1}
+  .links{margin-top:14px;display:flex;gap:14px;font-size:13px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .note{margin-top:34px;padding:14px 16px;border-left:3px solid var(--warn);
+        background:#1b1f27;border-radius:6px;color:var(--dim);font-size:13.5px}
+  footer{text-align:center;color:var(--dim);font-size:12.5px;padding:30px 20px 50px;
+         border-top:1px solid var(--line)}
+  code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12.5px;
+       background:#1f2630;padding:1px 6px;border-radius:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>myaishitmodels · 模型导航</h1>
+  <div class="sub">用奇奇怪怪的东西做的奇奇怪怪的模型。全部纯 NumPy、零依赖、产物放 Release。</div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <article class="card">
+      <h2>HWNB-1-turboflash</h2>
+      <div class="tags">
+        <span class="tag">周期固定输出</span>
+        <span class="tag">263.9 KB</span>
+        <span class="tag">243K 参数</span>
+        <span class="tag">2 层 d64</span>
+        <span class="tag">15 MB 流式</span>
+      </div>
+      <p class="desc">无论输入什么，都按同一份 2,001 字文档持续输出，直到达到字节上限。
+        周期位置嵌入 + 滑动窗口，同一位相永远预测同一个 token。</p>
+      <div class="links">
+        <a href="./hwnb-1-turboflash/">模型说明</a>
+        <a href="https://github.com/KunOcean/myaishitmodels-AI-/releases/latest">下载 model.bin</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>parrot-80k</h2>
+      <div class="tags">
+        <span class="tag">固定单句回复</span>
+        <span class="tag">80.1 KB</span>
+        <span class="tag">74,880 参数</span>
+        <span class="tag">2 层 d64</span>
+        <span class="tag">1 ms/句</span>
+      </div>
+      <p class="desc">无论输入什么，都只回一句「听君一席话，如听一席话。」。
+        答案区掩码与输入完全隔离，任意 prompt 的 logits 逐位相同。</p>
+      <div class="links">
+        <a href="./parrot-80k/">模型说明</a>
+        <a href="https://github.com/KunOcean/myaishitmodels-AI-/releases/latest">下载 parrot-mini.bin</a>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="note">
+    模型二进制放在 <a href="https://github.com/KunOcean/myaishitmodels-AI-/releases">Releases</a>，
+    仓库内只保留源码、文档与 <code>content.txt</code>。下载后在对应目录下运行
+    <code class="code">python ../core/parrot.py --model parrot-mini.bin</code> 之类的命令即可。
+  </div>
+</main>
+
+<footer>
+  MIT License · 基于 NumPy 手写前向与反向传播 · 无 GPU · 无外部依赖
+</footer>
+</body>
+</html>

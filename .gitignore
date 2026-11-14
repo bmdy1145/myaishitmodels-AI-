@@ -1,0 +1,9 @@
+# model binaries live in GitHub Releases, not in the repo
+*.bin
+!*.gitkeep
+
+__pycache__/
+*.pyc
+.pytest_cache/
+out.txt
+*.tmp
