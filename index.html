@@ -45,6 +45,23 @@
   <div class="grid">
 
     <article class="card">
+      <h2>π-1-Pro</h2>
+      <div class="tags">
+        <span class="tag">无限圆周率</span>
+        <span class="tag">算法模型</span>
+        <span class="tag">~650k 位/秒</span>
+        <span class="tag">无大小上限</span>
+        <span class="tag">三重校验</span>
+      </div>
+      <p class="desc">输入任意内容后，计算圆周率并持续输出，不限制大小，不打断就一直输出。
+        Chudnovsky + 二分拆分 + 整数平方根，独立 spigot 与 AGM 交叉校验。</p>
+      <div class="links">
+        <a href="./pi-1-pro/">模型说明</a>
+        <a href="https://github.com/KunOcean/myaishitmodels-AI-/releases/download/v0.2.0/pi-1m.txt">下载 100 万位</a>
+      </div>
+    </article>
+
+    <article class="card">
       <h2>HWNB-1-turboflash</h2>
       <div class="tags">
         <span class="tag">周期固定输出</span>
@@ -81,7 +98,7 @@
   </div>
 
   <div class="note">
-    模型二进制放在 <a href="https://github.com/KunOcean/myaishitmodels-AI-/releases">Releases</a>，
+    模型二进制与超大数据文件放在 <a href="https://github.com/KunOcean/myaishitmodels-AI-/releases">Releases</a>，
     仓库内只保留源码、文档与 <code>content.txt</code>。下载后在对应目录下运行
     <code class="code">python ../core/parrot.py --model parrot-mini.bin</code> 之类的命令即可。
   </div>

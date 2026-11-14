@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>parrot-80k · 模型卡片</title>
+<style>
+  :root{--bg:#0e1116;--panel:#161b22;--line:#232a33;--fg:#e6edf3;--dim:#8b949e;
+        --accent:#58a6ff;--ok:#3fb950}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:15px/1.7 ui-sans-serif,-apple-system,"Segoe UI","Noto Sans SC",sans-serif}
+  header{padding:44px 24px 22px;border-bottom:1px solid var(--line)}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{margin:0;font-size:27px;font-family:ui-monospace,Consolas,monospace}
+  .sub{color:var(--dim);margin-top:8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:26px 24px 80px}
+  h2{font-size:18px;margin:30px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:500;width:38%}
+  code{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;
+       background:#1f2630;padding:1px 6px;border-radius:4px}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+      padding:14px 16px;overflow:auto;font-size:13px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .btn{display:inline-block;margin:6px 10px 0 0;padding:9px 16px;border-radius:8px;
+       background:#1f6feb;color:#fff;font-size:14px}
+  .btn.alt{background:#21262d;border:1px solid var(--line);color:var(--fg)}
+  .note{margin-top:22px;padding:12px 15px;border-left:3px solid var(--ok);
+        background:#121a15;color:var(--dim);font-size:13.5px;border-radius:6px}
+  .back{font-size:13px;color:var(--dim)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="../">← 返回模型导航</a>
+  <h1>parrot-80k</h1>
+  <div class="sub">固定单句回复的 80 KB 迷你大模型 · 纯 NumPy · 零依赖</div>
+</div></header>
+
+<main>
+  <p>无论输入什么，都只回一句 <code>听君一席话，如听一席话。</code></p>
+
+  <a class="btn" href="https://github.com/KunOcean/myaishitmodels-AI-/releases/download/v0.1.0/parrot-mini.bin">下载 parrot-mini.bin</a>
+  <a class="btn alt" href="https://github.com/KunOcean/myaishitmodels-AI-/blob/main/parrot-80k/README.md">README</a>
+  <a class="btn alt" href="https://github.com/KunOcean/myaishitmodels-AI-/blob/main/parrot-80k/content.txt">content.txt</a>
+
+  <h2>规格</h2>
+  <table>
+    <tr><th>模型文件</th><td>81,972 bytes（80.1 KB）</td></tr>
+    <tr><th>参数</th><td>74,880</td></tr>
+    <tr><th>结构</th><td>2 层 / 4 头 / d_model 64 / d_ff 160 / RoPE / 用户窗口 64</td></tr>
+    <tr><th>量化</th><td>int8 行量化 + float32 RMSNorm gamma + SHA-256 校验</td></tr>
+    <tr><th>训练</th><td>200 步内收敛 / 36 s</td></tr>
+    <tr><th>自测</th><td>1000 个差异极大的输入，答案 logits 逐位一致，min margin 6.68</td></tr>
+    <tr><th>单句生成</th><td>11.6 ms（无 KV cache 的保守实现）</td></tr>
+    <tr><th>批量吞吐</th><td>20 线程 batch 2048 约 185k 位置/s</td></tr>
+  </table>
+
+  <h2>原理</h2>
+  <p>序列布局固定：<code>[BOS] + 用户窗口(64 槽) + [SEP] + 答案 + [EOS]</code>。
+     SEP 与答案位置的注意力掩码看不到任何用户槽位，位置 ID 也与输入长度无关，
+     因此任意输入的答案 logits 逐位相同（<code>np.array_equal</code> 断言）。
+     这是架构保证，不是概率碰巧；训练时用户槽位对答案损失的梯度严格为 0。</p>
+
+  <h2>使用</h2>
+  <pre># 下载 parrot-mini.bin 到本目录后
+cd core
+python chat.py --model ../parrot-80k/parrot-mini.bin --once "随便问"
+printf '你好\n/exit\n' | python chat.py --model ../parrot-80k/parrot-mini.bin --no-delay
+python parrot.py --model ../parrot-80k/parrot-mini.bin --selftest --n 1000</pre>
+
+  <div class="note">代码调用：<code>import parrot; parrot.greet("随便问什么")</code>。
+    换内容只需编辑 content.txt 后重跑 <code>train.py --preset mini</code>（约 36 s）。</div>
+</main>
+</body>
+</html>

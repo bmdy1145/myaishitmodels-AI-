@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>π-1-Pro · 模型卡片</title>
+<style>
+  :root{--bg:#0e1116;--panel:#161b22;--line:#232a33;--fg:#e6edf3;--dim:#8b949e;
+        --accent:#58a6ff;--ok:#3fb950;--warn:#d29922}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:15px/1.7 ui-sans-serif,-apple-system,"Segoe UI","Noto Sans SC",sans-serif}
+  header{padding:44px 24px 22px;border-bottom:1px solid var(--line)}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{margin:0;font-size:27px;font-family:ui-monospace,Consolas,monospace}
+  .sub{color:var(--dim);margin-top:8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:26px 24px 80px}
+  h2{font-size:18px;margin:30px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:500;width:38%}
+  code{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;
+       background:#1f2630;padding:1px 6px;border-radius:4px}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+      padding:14px 16px;overflow:auto;font-size:13px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .btn{display:inline-block;margin:6px 10px 0 0;padding:9px 16px;border-radius:8px;
+       background:#1f6feb;color:#fff;font-size:14px}
+  .btn.alt{background:#21262d;border:1px solid var(--line);color:var(--fg)}
+  .note{margin-top:22px;padding:12px 15px;border-left:3px solid var(--warn);
+        background:#1b1f27;color:var(--dim);font-size:13.5px;border-radius:6px}
+  .ok{border-left-color:var(--ok);background:#121a15}
+  .back{font-size:13px;color:var(--dim)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="../">← 返回模型导航</a>
+  <h1>π-1-Pro</h1>
+  <div class="sub">无限圆周率流 · 每一位都是真算出来的 · 纯 Python（可选 gmpy2 加速）</div>
+</div></header>
+
+<main>
+  <p>输入任意内容后，计算圆周率并持续输出，不限制大小，不打断就一直输出。</p>
+
+  <a class="btn" href="https://github.com/KunOcean/myaishitmodels-AI-/releases/download/v0.2.0/pi-1m.txt">下载 pi-1m.txt（100 万位）</a>
+  <a class="btn alt" href="https://github.com/KunOcean/myaishitmodels-AI-/blob/main/pi-1-pro/README.md">README</a>
+  <a class="btn alt" href="https://github.com/KunOcean/myaishitmodels-AI-/blob/main/core/pi1pro.py">源码</a>
+
+  <h2>为什么不是神经网络</h2>
+  <p>Transformer 无法无限生成 π 的数字而不漂移成胡编乱造。需求要的是「算多快就多快、
+     数字必须正确」，所以 π-1-Pro 用算法而不是权重：Chudnovsky 级数 + 二分拆分 +
+     整数平方根，并用独立的 Gibbons spigot 与 Gauss–Legendre AGM 交叉校验。</p>
+
+  <h2>实测</h2>
+  <table>
+    <tr><th>1,000,000 位</th><td>0.9 s（~650k 位/秒，gmpy2）</td></tr>
+    <tr><th>5,000,000 位</th><td>7.7 s</td></tr>
+    <tr><th>10,000,000 位</th><td>22.0 s</td></tr>
+    <tr><th>30 秒持续输出</th><td>5,120,000 位，全量逐位校验通过</td></tr>
+    <tr><th>纯 Python（无 gmpy2）</th><td>约为 1/20 速度，100 万位约 10 s</td></tr>
+  </table>
+
+  <h2>正确性</h2>
+  <table>
+    <tr><th>Chudnovsky vs Gibbons spigot</th><td>前 10,000 位一致</td></tr>
+    <tr><th>Chudnovsky vs Gauss–Legendre AGM</th><td>前 20,000 位一致</td></tr>
+    <tr><th>跨块校验</th><td>每次重算都断言以已输出前缀开头</td></tr>
+  </table>
+
+  <h2>使用</h2>
+  <pre>cd core
+python pi1pro.py                        # 无限输出（Ctrl-C 停止）
+python pi1pro.py --max-digits 1000000   # 算到 100 万位
+python pi1pro.py --out pi.txt           # 写文件
+python pi1pro.py --verify 10000         # 用独立算法对拍
+python -m pip install gmpy2             # 可选：20x 加速</pre>
+
+  <div class="note">时间随位数超线性增长（大整数乘法本身如此）。「无限」意味着
+    「直到内存或你的耐心耗尽」；块倍增时输出会暂停数秒，进度打在 stderr。</div>
+  <div class="note ok">输出是纯 ASCII 数字流：<code>python pi1pro.py | wc -c</code>、
+    <code>head -c 1000</code> 都能直接用。</div>
+</main>
+</body>
+</html>

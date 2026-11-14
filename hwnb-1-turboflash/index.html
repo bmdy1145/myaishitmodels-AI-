@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HWNB-1-turboflash · 模型卡片</title>
+<style>
+  :root{--bg:#0e1116;--panel:#161b22;--line:#232a33;--fg:#e6edf3;--dim:#8b949e;
+        --accent:#58a6ff;--ok:#3fb950}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:15px/1.7 ui-sans-serif,-apple-system,"Segoe UI","Noto Sans SC",sans-serif}
+  header{padding:44px 24px 22px;border-bottom:1px solid var(--line)}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{margin:0;font-size:27px;font-family:ui-monospace,Consolas,monospace}
+  .sub{color:var(--dim);margin-top:8px;font-size:14px}
+  main{max-width:860px;margin:0 auto;padding:26px 24px 80px}
+  h2{font-size:18px;margin:30px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:500;width:38%}
+  code{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;
+       background:#1f2630;padding:1px 6px;border-radius:4px}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+      padding:14px 16px;overflow:auto;font-size:13px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .btn{display:inline-block;margin:6px 10px 0 0;padding:9px 16px;border-radius:8px;
+       background:#1f6feb;color:#fff;font-size:14px}
+  .btn.alt{background:#21262d;border:1px solid var(--line);color:var(--fg)}
+  .note{margin-top:22px;padding:12px 15px;border-left:3px solid var(--ok);
+        background:#121a15;color:var(--dim);font-size:13.5px;border-radius:6px}
+  .back{font-size:13px;color:var(--dim)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="../">← 返回模型导航</a>
+  <h1>HWNB-1-turboflash</h1>
+  <div class="sub">周期性固定输出的 decoder-only Transformer · 纯 NumPy · 零依赖</div>
+</div></header>
+
+<main>
+  <p>无论输入什么，都从同一句话开始、按同一份文档持续输出，直到达到字节上限（默认 15 MB）。</p>
+
+  <a class="btn" href="https://github.com/KunOcean/myaishitmodels-AI-/releases/download/v0.1.0/model.bin">下载 model.bin</a>
+  <a class="btn alt" href="https://github.com/KunOcean/myaishitmodels-AI-/blob/main/hwnb-1-turboflash/README.md">README</a>
+  <a class="btn alt" href="https://github.com/KunOcean/myaishitmodels-AI-/blob/main/hwnb-1-turboflash/content.txt">content.txt</a>
+
+  <h2>规格</h2>
+  <table>
+    <tr><th>模型文件</th><td>270,284 bytes（263.9 KB）</td></tr>
+    <tr><th>参数</th><td>243,200</td></tr>
+    <tr><th>结构</th><td>2 层 / 4 头 / d_model 64 / d_ff 160 / 窗口 64</td></tr>
+    <tr><th>量化</th><td>int8 行量化 + float32 RMSNorm gamma + SHA-256 校验</td></tr>
+    <tr><th>内容长度</th><td>2,001 字（635 个不重复字符）</td></tr>
+    <tr><th>训练</th><td>2,600 步 / 227 s / 最终 loss 9.6e-4</td></tr>
+    <tr><th>自测</th><td>逐 token 生成 4,034 个（两整轮 + 32），min logit margin 2.27</td></tr>
+    <tr><th>15 MB 输出</th><td>约 7.1 s（生成校验 + 周期重复）</td></tr>
+  </table>
+
+  <h2>原理</h2>
+  <p>周期位置嵌入：相位 = 文档下标 mod C，另有 SEP / 其他两个相位。注意力用滑窗
+     （最近 64 个答案 token），答案行永远看不到用户 token。因为相位周期性，模型在窗口内
+     看不到「这是第几遍」，同一位相永远预测同一个 token，于是可以无限循环。</p>
+  <p>运行时并不盲信这个假设：先逐 token 真实生成两整轮 + 32 个 token 并全部断言，
+     确认后再按字节上限重复已验证的周期。</p>
+
+  <h2>使用</h2>
+  <pre># 下载 model.bin 到本目录后
+cd core
+python hwnb.py --model ../hwnb-1-turboflash/model.bin --once
+python hwnb.py --model ../hwnb-1-turboflash/model.bin --max-bytes 15728640 > out.txt
+python hwnb.py --model ../hwnb-1-turboflash/model.bin --selftest</pre>
+
+  <div class="note">任意 prompt 生成的 token 序列逐 token 相同；这是掩码与相位设计的结果，
+    自测会同时验证这一点。</div>
+</main>
+</body>
+</html>
